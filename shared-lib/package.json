@@ -1,0 +1,17 @@
+{
+    "name": "@automation/shared-lib",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "dotenv": "^17.2.3",
+        "playwright": "^1.40.0",
+        "webdriverio": "^8.0.0"
+    },
+    "devDependencies": {
+        "typescript": "^5.0.0"
+    }
+}

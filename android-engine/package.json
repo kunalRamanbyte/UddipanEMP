@@ -1,0 +1,11 @@
+{
+    "name": "@automation/android-engine",
+    "version": "1.0.0",
+    "scripts": {
+        "test": "npx wdio run wdio.conf.ts"
+    },
+    "dependencies": {
+        "@automation/shared-lib": "*",
+        "webdriverio": "^8.0.0"
+    }
+}

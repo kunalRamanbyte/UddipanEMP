@@ -1,0 +1,39 @@
+name: E2E Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    
+    - name: Install dependencies
+      run: npm install
+
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+
+    # Android Emulator Setup (simplified for CI)
+    - name: Enable KVM group perms
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+
+    - name: Run Web Tests
+      run: npm test -w web-engine
+
+    # - name: Run Android Tests
+    #   uses: reactivecircus/android-emulator-runner@v2
+    #   with:
+    #     api-level: 29
+    #     script: npm test -w android-engine

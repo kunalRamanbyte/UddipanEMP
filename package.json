@@ -1,0 +1,17 @@
+{
+  "name": "automation-ecosystem",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared-lib",
+    "web-engine",
+    "android-engine",
+    "data-vault"
+  ],
+  "scripts": {
+    "test": "npm test --workspaces"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
+}

@@ -1,5 +1,6 @@
 import { Logger } from './Logger';
 import { UniversalDriver } from './UniversalDriver';
+import { LocatorResolver } from './LocatorResolver';
 
 export type ActionHandler = (driver: UniversalDriver, logger: Logger, data?: string, selector?: string) => Promise<void>;
 
@@ -61,18 +62,23 @@ export class ActionRegistry {
         // --- COMPOSITE ACTIONS ---
         this.registerAction('login_to_employer_portal', async (driver, logger) => {
             logger.info("🚀 Executing Composite Action: Login to Employer Portal");
-            // These would normally be strings/selectors from a centralized repo
-            // but for simplicity in the handler:
-            await driver.navigate('https://testplacementwebv1.azurewebsites.net/');
-            await driver.click("a[href*='logType=EMP']");
-            await driver.waitFor("button:has-text('Employer Login')");
-            await driver.click("button:has-text('Employer Login')");
-            await driver.click("button:has-text('Sign in with email')");
-            await driver.type("input[name='email']", "oracle.tech@yopmail.com");
-            await driver.click("button:has-text('Next')");
-            await driver.type("input[name='password']", "Pibm@123");
-            await driver.click("button:has-text('Sign In')");
-            await driver.waitFor("text=Dashboard");
+
+            const navigate = (url: string) => driver.navigate(url);
+            const click = (sel: string) => driver.click(LocatorResolver.resolve(sel));
+            const wait = (sel: string) => driver.waitFor(LocatorResolver.resolve(sel));
+            const type = (sel: string, val: string) => driver.type(LocatorResolver.resolve(sel), val);
+
+            await navigate('https://testplacementwebv1.azurewebsites.net/');
+            await click("a[href*='logType=EMP']");
+            await wait("button:has-text('Employer Login')");
+            await click("button:has-text('Employer Login')");
+            await click("button:has-text('Sign in with email')");
+            await type("input[name='email']", "oracle.tech@yopmail.com");
+            await click("button:has-text('Next')");
+            await type("input[name='password']", "Pibm@123");
+            await click("button:has-text('Sign In')");
+            await wait("text=Dashboard");
+
             logger.info("✅ Composite Action: Login Success!");
         });
     }

@@ -1,6 +1,14 @@
 {
     "envName": "dev",
     "baseUrl": "https://testplacementwebv1.azurewebsites.net/",
+    "appUrl": "https://testplacementwebv1.azurewebsites.net/",
+    "timeout": 30000,
+    "quality_gate": {
+        "maxHealingRate": 0.10,
+        "maxRetryRate": 0.30,
+        "failOnHealing": true,
+        "failOnRetries": false
+    },
     "capabilities": {
         "headless": false
     },

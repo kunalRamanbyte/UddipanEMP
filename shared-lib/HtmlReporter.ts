@@ -14,19 +14,24 @@ export interface TestResult {
     screenshot?: string;
     confidence?: number;
     healingReason?: string;
+    retryCount?: number;
+    isHealed?: boolean;
 }
 
 export class HtmlReporter {
     private results: TestResult[] = [];
 
     logResult(result: TestResult) {
+        // Automatically set isHealed if status is HEALED
+        if (result.status === 'HEALED') result.isHealed = true;
         this.results.push(result);
     }
 
     generateReport(outputPath: string) {
-        const passCount = this.results.filter(r => r.status === 'PASS').length;
-        const failCount = this.results.filter(r => r.status === 'FAIL').length;
+        const totalDuration = this.results.reduce((sum, r) => sum + (r.duration || 0), 0);
+        const totalRetries = this.results.reduce((sum, r) => sum + (r.retryCount || 0), 0);
         const healedCount = this.results.filter(r => r.status === 'HEALED').length;
+        const totalSteps = this.results.length;
 
         // Group results by testCaseId
         const groupedResults: Record<string, TestResult[]> = {};
@@ -40,6 +45,20 @@ export class HtmlReporter {
         const healedCases = Object.values(groupedResults).filter(steps => !steps.some(s => s.status === 'FAIL') && steps.some(s => s.status === 'HEALED')).length;
         const passedCases = totalCases - failedCases - healedCases;
 
+        // Manager Insights
+        const flakiestTests = Object.entries(groupedResults)
+            .map(([id, steps]) => ({ id, retries: steps.reduce((s, st) => s + (st.retryCount || 0), 0) }))
+            .filter(t => t.retries > 0)
+            .sort((a, b) => b.retries - a.retries)
+            .slice(0, 3);
+
+        const mostHealed = Object.entries(
+            this.results.filter(r => r.status === 'HEALED').reduce((acc, r) => {
+                acc[r.selector] = (acc[r.selector] || 0) + 1;
+                return acc;
+            }, {} as Record<string, number>)
+        ).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
         const html = `
 <!DOCTYPE html>
 <html>
@@ -50,13 +69,25 @@ export class HtmlReporter {
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background-color: #f8f9fa; color: #333; }
         h1 { color: #2c3e50; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
         
-        .dashboard-row { display: flex; gap: 30px; margin-bottom: 30px; align-items: flex-start; }
-        .summary-container { flex: 1; display: flex; flex-direction: column; gap: 20px; }
-        .summary { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 40px; }
-        .summary-item { text-align: center; }
-        .summary-item .value { font-size: 24px; font-weight: bold; display: block; color: #007bff; }
-        .summary-item .label { color: #666; font-size: 14px; text-transform: uppercase; }
-        .chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 300px; height: 350px; }
+        .dashboard-row { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+        .summary-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; min-width: 200px; border-top: 4px solid #007bff; }
+        .summary-card.success { border-top-color: #28a745; }
+        .summary-card.warning { border-top-color: #ffc107; }
+        .summary-card.danger { border-top-color: #dc3545; }
+        
+        .summary-card .value { font-size: 28px; font-weight: bold; display: block; color: #333; }
+        .summary-card .label { color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .insight-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .insight-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .insight-card h3 { margin-top: 0; color: #2c3e50; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        
+        .metric-list { list-style: none; padding: 0; margin: 0; }
+        .metric-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #fafafa; font-size: 14px; }
+        .metric-item:last-child { border-bottom: none; }
+        .metric-item .tag { background: #f1f3f5; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+
+        .chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 300px; }
         
         .test-case-card { background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; overflow: hidden; border-left: 5px solid #ddd; }
         .test-case-card.pass { border-left-color: #28a745; }
@@ -68,8 +99,6 @@ export class HtmlReporter {
         .test-case-title { font-weight: bold; font-size: 18px; color: #2c3e50; }
         .test-case-meta { font-size: 13px; color: #666; }
 
-        .steps-table-container { display: none; padding: 0 20px 20px 20px; background: #fafafa; border-top: 1px solid #eee; }
-        
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; font-size: 14px; }
         th { background-color: #f1f3f5; color: #495057; font-weight: 600; }
@@ -85,9 +114,6 @@ export class HtmlReporter {
         .log-container { font-family: 'Consolas', monospace; font-size: 12px; background: #2d3436; color: #dfe6e9; padding: 10px; border-radius: 4px; margin-top: 8px; display: none; }
         .toggle-logs { color: #007bff; cursor: pointer; text-decoration: underline; font-size: 12px; }
         .screenshot-img { max-width: 100%; border: 2px solid #ddd; border-radius: 4px; margin-top: 10px; cursor: zoom-in; }
-        
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; margin-left: 10px; font-weight: normal; }
-        .badge-fail { background: #fee2e2; color: #991b1b; }
     </style>
     <script>
         function toggleSteps(id) {
@@ -99,9 +125,8 @@ export class HtmlReporter {
             el.style.display = el.style.display === 'block' ? 'none' : 'block';
         }
         window.onload = function() {
-            const ctx = document.getElementById('resultsChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
+            new Chart(document.getElementById('resultsChart'), {
+                type: 'doughnut',
                 data: {
                     labels: ['Passed', 'Failed', 'Healed'],
                     datasets: [{
@@ -109,30 +134,82 @@ export class HtmlReporter {
                         backgroundColor: ['#28a745', '#dc3545', '#ffc107']
                     }]
                 },
-                options: { maintainAspectRatio: false }
+                options: { maintainAspectRatio: false, cutout: '70%' }
             });
         };
     </script>
 </head>
 <body>
-    <h1>Automation Execution Report</h1>
+    <h1>Quality Observability Dashboard</h1>
     
     <div class="dashboard-row">
-        <div class="summary-container">
-            <div class="summary">
-                <div class="summary-item"><span class="value">${totalCases}</span><span class="label">Total Cases</span></div>
-                <div class="summary-item"><span class="value">${passedCases}</span><span class="label">Passed</span></div>
-                <div class="summary-item"><span class="value">${failedCases}</span><span class="label">Failed</span></div>
-                <div class="summary-item"><span class="value">${healedCases}</span><span class="label">Healed</span></div>
-            </div>
-            <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+        <div class="summary-card success">
+            <span class="label">Platform Health</span>
+            <span class="value">${Math.round(((passedCases + healedCases) / totalCases) * 100)}%</span>
         </div>
+        <div class="summary-card">
+            <span class="label">Total Execution</span>
+            <span class="value">${(totalDuration / 1000).toFixed(1)}s</span>
+        </div>
+        <div class="summary-card warning">
+            <span class="label">AI Healing ROI</span>
+            <span class="value">${healedCount} Saves</span>
+        </div>
+        <div class="summary-card danger">
+            <span class="label">Total Retries</span>
+            <span class="value">${totalRetries}</span>
+        </div>
+    </div>
+
+    <div class="insight-section">
+        <div class="insight-card">
+            <h3>🛡️ Resilience & Stability Insights</h3>
+            <ul class="metric-list">
+                <li class="metric-item">
+                    <span>Healing Success Rate</span>
+                    <span class="tag">${Math.round((healedCount / (healedCount + failedCases || 1)) * 100)}%</span>
+                </li>
+                <li class="metric-item">
+                    <span>Avg. Step Duration</span>
+                    <span class="tag">${Math.round(totalDuration / totalSteps)}ms</span>
+                </li>
+                <li class="metric-item">
+                    <span>Automation Coverage</span>
+                    <span class="tag">${totalCases} Cases</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="insight-card">
+            <h3>⚠️ Technical Debt (Most Healed)</h3>
+            <ul class="metric-list">
+                ${mostHealed.length > 0 ? mostHealed.map(([sel, count]) => `
+                    <li class="metric-item">
+                        <code style="font-size: 11px;">${sel.substring(0, 30)}...</code>
+                        <span class="tag" style="background:#fff3cd; color:#856404">${count} Fixes</span>
+                    </li>
+                `).join('') : '<li class="metric-item">No healing needed yet! ✅</li>'}
+            </ul>
+        </div>
+
+        <div class="insight-card">
+            <h3>🌊 Flaky Test Analysis (Top Retries)</h3>
+            <ul class="metric-list">
+                ${flakiestTests.length > 0 ? flakiestTests.map(t => `
+                    <li class="metric-item">
+                        <span>${t.id}</span>
+                        <span class="tag" style="background:#fee2e2; color:#991b1b">${t.retries} Retries</span>
+                    </li>
+                `).join('') : '<li class="metric-item">Zero flakiness detected! 🚀</li>'}
+            </ul>
+        </div>
+        
         <div class="chart-container">
             <canvas id="resultsChart"></canvas>
         </div>
     </div>
 
-    <h2>Test Cases</h2>
+    <h2>Execution Details</h2>
     ${Object.entries(groupedResults).map(([caseId, steps], index) => {
             const caseStatus = steps.some(s => s.status === 'FAIL') ? 'fail' :
                 steps.some(s => s.status === 'HEALED') ? 'healed' : 'pass';
@@ -150,7 +227,7 @@ export class HtmlReporter {
                     <span>${totalDuration}ms</span>
                 </div>
             </div>
-            <div id="steps-${index}" class="steps-table-container">
+            <div id="steps-${index}" class="steps-table-container " style="display:none">
                 <table>
                     <thead>
                         <tr>
@@ -158,7 +235,7 @@ export class HtmlReporter {
                             <th>Action</th>
                             <th>Target</th>
                             <th>Status</th>
-                            <th>Duration</th>
+                            <th>Time</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -171,7 +248,10 @@ export class HtmlReporter {
                                 ${r.confidence !== undefined ? `<span class="confidence-badge">AI Confidence: ${Math.round(r.confidence * 100)}%</span>` : ''}
                                 ${r.healingReason ? `<div class="healing-reason">AI Logic: ${r.healingReason}</div>` : ''}
                             </td>
-                            <td><span class="status-pill ${r.status.toLowerCase()}-pill">${r.status}</span></td>
+                            <td>
+                                <span class="status-pill ${r.status.toLowerCase()}-pill">${r.status}</span>
+                                ${r.retryCount ? `<span class="badge badge-fail">Retries: ${r.retryCount}</span>` : ''}
+                            </td>
                             <td>${r.duration}ms</td>
                         </tr>
                         <tr>
@@ -194,8 +274,10 @@ export class HtmlReporter {
 </body>
 </html>`;
 
+        const fs = require('fs');
+        const path = require('path');
         fs.writeFileSync(outputPath, html);
-        console.log(`[Reporter] Report generated at: ${outputPath}`);
+        console.log(`[Reporter] Observability Report generated at: ${outputPath}`);
         return outputPath;
     }
 }

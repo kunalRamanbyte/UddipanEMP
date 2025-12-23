@@ -1,11 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { QualityGateConfig } from './QualityGate';
+
 export interface AppConfig {
     baseUrl: string;
+    appUrl?: string;
     envName: string;
+    timeout?: number;
     capabilities?: Record<string, any>;
     credentials?: Record<string, string>;
+    quality_gate?: QualityGateConfig;
 }
 
 export class ConfigProvider {

@@ -1,5 +1,11 @@
 export class Logger {
+    private static instance: Logger;
     private logs: string[] = [];
+
+    public static getInstance(): Logger {
+        if (!Logger.instance) Logger.instance = new Logger();
+        return Logger.instance;
+    }
 
     info(message: string) {
         const formatted = `[INFO] ${new Date().toLocaleTimeString()}: ${message}`;
@@ -38,5 +44,13 @@ export class Logger {
 
     static suiteError(message: string, error?: any) {
         console.error(`[SUITE-ERROR] ${new Date().toLocaleTimeString()}: ${message}${error ? ` - ${error.message || error}` : ''}`);
+    }
+
+    suiteWarn(message: string) {
+        Logger.suiteWarn(message);
+    }
+
+    suiteInfo(message: string) {
+        Logger.suiteInfo(message);
     }
 }

@@ -30,7 +30,11 @@ async function main() {
 
     // 3. Run Tests
     const runner = new TestRunner(PlaywrightDriver, WebLocators);
-    await runner.runSuite(suiteToRun);
+    const success = await runner.runSuite(suiteToRun);
+
+    if (!success) {
+        process.exit(1);
+    }
 }
 
 main().catch(console.error);

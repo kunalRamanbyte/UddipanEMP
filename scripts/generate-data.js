@@ -17,8 +17,17 @@ const data = [
     { testCaseId: 'TC003', id: '3', action: 'click', selector: 'EMPLOYER_LOGIN_BTN', data: '' },
     { testCaseId: 'TC003', id: '4', action: 'waitFor', selector: 'text=Invalid', data: '' },
 
-    // Test Case 4: Full Employer Login Flow (Success via Composite Action)
-    { testCaseId: 'TC004', id: '1', action: 'LOGIN_TO_EMPLOYER_PORTAL', selector: '', data: '' }
+    // Test Case 4: Full Employer Login Flow (Success - Direct Steps)
+    { testCaseId: 'TC004', id: '1', action: 'navigate', selector: '', data: 'https://testplacementwebv1.azurewebsites.net/' },
+    { testCaseId: 'TC004', id: '2', action: 'click', selector: "css:a[href*='logType=EMP']", data: '' },
+    { testCaseId: 'TC004', id: '3', action: 'waitFor', selector: "css:button:has-text('Employer Login')", data: '' },
+    { testCaseId: 'TC004', id: '4', action: 'click', selector: "css:button:has-text('Employer Login')", data: '' },
+    { testCaseId: 'TC004', id: '5', action: 'click', selector: "css:button:has-text('Sign in with email')", data: '' },
+    { testCaseId: 'TC004', id: '6', action: 'type', selector: "css:input[name='email']", data: 'oracle.tech@yopmail.com' },
+    { testCaseId: 'TC004', id: '7', action: 'click', selector: "css:button:has-text('Next')", data: '' },
+    { testCaseId: 'TC004', id: '8', action: 'type', selector: "css:input[name='password']", data: 'Pibm@123' },
+    { testCaseId: 'TC004', id: '9', action: 'click', selector: "css:button:has-text('Sign In')", data: '' },
+    { testCaseId: 'TC004', id: '10', action: 'waitFor', selector: 'text=Dashboard', data: '' }
 ];
 
 const ws = XLSX.utils.json_to_sheet(data);

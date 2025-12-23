@@ -18,7 +18,16 @@ export class PlaywrightDriver extends UniversalDriver {
 
     async click(selector: string): Promise<void> {
         if (!this.page) throw new Error("Driver not initialized");
-        await this.page.click(selector);
+        try {
+            // First attempt: Standard click with 10s timeout
+            await this.page.click(selector, { timeout: 10000 });
+        } catch (error) {
+            // Fallback: Direct JS click for hidden/obscured elements
+            await this.page.$eval(selector, (el: any) => el.click()).catch(() => {
+                // If even JS click fails, throw the original error
+                throw error;
+            });
+        }
     }
 
     async type(selector: string, text: string): Promise<void> {

@@ -86,14 +86,18 @@ export class TestRunner {
 
         try {
             for (const step of steps) {
-                await this.runStep(caseId, step, platform, driver, logger);
+                const status = await this.runStep(caseId, step, platform, driver, logger);
+                if (status === 'FAIL') {
+                    logger.error(`Stopping test case ${caseId} due to critical step failure.`);
+                    break;
+                }
             }
         } catch (error) {
             logger.error(`Test Case ${caseId} failed unexpectedly`, error);
         }
     }
 
-    private async runStep(caseId: string, step: TestCase, platform: string, driver: UniversalDriver, logger: Logger) {
+    private async runStep(caseId: string, step: TestCase, platform: string, driver: UniversalDriver, logger: Logger): Promise<'PASS' | 'FAIL' | 'HEALED'> {
         const startTime = Date.now();
         logger.info(`Executing ${caseId} | Step ${step.id}: ${step.action}`);
 
@@ -168,6 +172,7 @@ export class TestRunner {
                 }
             }
             this.reporter.logResult(result);
+            return result.status;
         }
     }
 

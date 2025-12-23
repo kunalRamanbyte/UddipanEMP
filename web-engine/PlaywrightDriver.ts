@@ -10,7 +10,8 @@ export class PlaywrightDriver extends UniversalDriver {
     }
 
     async init() {
-        this.browser = await chromium.launch({ headless: false });
+        const isHeadless = process.env.HEADLESS !== 'false';
+        this.browser = await chromium.launch({ headless: isHeadless });
         const context = await this.browser.newContext();
         this.page = await context.newPage();
     }
@@ -38,6 +39,12 @@ export class PlaywrightDriver extends UniversalDriver {
     async getText(selector: string): Promise<string> {
         if (!this.page) throw new Error("Driver not initialized");
         return (await this.page.textContent(selector)) || '';
+    }
+
+    async takeScreenshot(): Promise<string | null> {
+        if (!this.page) return null;
+        const buffer = await this.page.screenshot({ type: 'png' });
+        return buffer.toString('base64');
     }
 
     async close() {

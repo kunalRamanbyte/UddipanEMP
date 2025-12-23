@@ -2,3 +2,8 @@ export * from './UniversalDriver';
 export * from './PlatformConfig';
 export * from './Healer';
 export * from './TestRunner';
+export * from './HtmlReporter';
+export * from './ConfigProvider';
+export * from './Logger';
+export * from './ActionRegistry';
+export * from './SchemaValidator';

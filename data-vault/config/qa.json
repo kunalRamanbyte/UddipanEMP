@@ -1,0 +1,11 @@
+{
+    "envName": "qa",
+    "baseUrl": "https://testplacementwebv1.azurewebsites.net/",
+    "capabilities": {
+        "headless": true
+    },
+    "credentials": {
+        "adminUser": "qa_admin",
+        "adminPass": "qa_pass123"
+    }
+}

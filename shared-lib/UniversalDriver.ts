@@ -16,4 +16,7 @@ export abstract class UniversalDriver {
     abstract waitFor(selector: string): Promise<void>;
     abstract navigate(url: string): Promise<void>;
     abstract getText(selector: string): Promise<string>;
+    abstract init(): Promise<void>;
+    abstract close(): Promise<void>;
+    abstract takeScreenshot(): Promise<string | null>;
 }

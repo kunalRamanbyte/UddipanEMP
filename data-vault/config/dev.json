@@ -1,0 +1,11 @@
+{
+    "envName": "dev",
+    "baseUrl": "https://testplacementwebv1.azurewebsites.net/",
+    "capabilities": {
+        "headless": false
+    },
+    "credentials": {
+        "adminUser": "dev_admin",
+        "adminPass": "dev_pass123"
+    }
+}

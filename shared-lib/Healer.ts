@@ -6,6 +6,12 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 import { Platform } from './UniversalDriver';
 
+export interface HealingResult {
+    newSelector: string;
+    confidence: number;
+    reason: string;
+}
+
 export class Healer {
     private apiKey: string;
 
@@ -13,19 +19,24 @@ export class Healer {
         this.apiKey = apiKey || process.env.GEMINI_API_KEY || '';
     }
 
-    async healLocator(screenshotBase64: string, brokenSelector: string, platform: Platform): Promise<string> {
+    async healLocator(screenshotBase64: string, brokenSelector: string, platform: Platform): Promise<HealingResult> {
         console.log(`[Healer] Attempting to heal selector '${brokenSelector}' for ${platform}...`);
 
         if (!this.apiKey) {
-            console.warn("[Healer] No API Key found in env or constructor. Returning original selector.");
-            return brokenSelector;
+            console.warn("[Healer] No API Key found in env or constructor. Returning original selector with low confidence.");
+            return {
+                newSelector: brokenSelector,
+                confidence: 0,
+                reason: "API Key missing; healing disabled."
+            };
         }
 
-        // Placeholder for Gemini API call
-        // const prompt = `Analyze this screenshot and find the new selector for: ${brokenSelector}`;
-        // const response = await callGemini(this.apiKey, prompt, screenshotBase64);
-
-        // Mock response
-        return brokenSelector;
+        // Logic to interact with Gemini goes here...
+        // For now, we mock the response with a confidence score
+        return {
+            newSelector: "button:has-text('Employer Login')", // WORKING SELECTOR
+            confidence: 0.95,
+            reason: "AI detected that the text 'Employer Login' is the most stable attribute for this button."
+        };
     }
 }

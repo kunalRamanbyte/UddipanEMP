@@ -6,7 +6,8 @@
     "shared-lib",
     "web-engine",
     "android-engine",
-    "data-vault"
+    "data-vault",
+    "mcp-server"
   ],
   "scripts": {
     "test": "npm test --workspaces"

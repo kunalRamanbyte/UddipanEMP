@@ -1,0 +1,79 @@
+import { Logger } from './Logger';
+import { UniversalDriver } from './UniversalDriver';
+
+export type ActionHandler = (driver: UniversalDriver, logger: Logger, data?: string, selector?: string) => Promise<void>;
+
+export class ActionRegistry {
+    private static instance: ActionRegistry;
+    private registry: Map<string, ActionHandler> = new Map();
+
+    private constructor() {
+        this.registerDefaultActions();
+    }
+
+    public static getInstance(): ActionRegistry {
+        if (!ActionRegistry.instance) {
+            ActionRegistry.instance = new ActionRegistry();
+        }
+        return ActionRegistry.instance;
+    }
+
+    public registerAction(name: string, handler: ActionHandler) {
+        this.registry.set(name.toLowerCase(), handler);
+    }
+
+    public getAction(name: string): ActionHandler | undefined {
+        return this.registry.get(name.toLowerCase());
+    }
+
+    public getSupportedActions(): string[] {
+        return Array.from(this.registry.keys());
+    }
+
+    private registerDefaultActions() {
+        this.registerAction('navigate', async (driver, logger, data) => {
+            if (!data) throw new Error("URL required for navigate action");
+            await driver.navigate(data);
+        });
+
+        this.registerAction('click', async (driver, logger, _, selector) => {
+            if (!selector) throw new Error("Selector required for click action");
+            await driver.click(selector);
+        });
+
+        this.registerAction('type', async (driver, logger, data, selector) => {
+            if (!selector) throw new Error("Selector required for type action");
+            if (!data) throw new Error("Data required for type action");
+            await driver.type(selector, data);
+        });
+
+        this.registerAction('waitfor', async (driver, logger, _, selector) => {
+            if (!selector) throw new Error("Selector required for waitFor action");
+            await driver.waitFor(selector);
+        });
+
+        this.registerAction('gettext', async (driver, logger, _, selector) => {
+            if (!selector) throw new Error("Selector required for getText action");
+            const text = await driver.getText(selector);
+            logger.info(`Extracted text: ${text}`);
+        });
+
+        // --- COMPOSITE ACTIONS ---
+        this.registerAction('login_to_employer_portal', async (driver, logger) => {
+            logger.info("🚀 Executing Composite Action: Login to Employer Portal");
+            // These would normally be strings/selectors from a centralized repo
+            // but for simplicity in the handler:
+            await driver.navigate('https://testplacementwebv1.azurewebsites.net/');
+            await driver.click("a[href*='logType=EMP']");
+            await driver.waitFor("button:has-text('Employer Login')");
+            await driver.click("button:has-text('Employer Login')");
+            await driver.click("button:has-text('Sign in with email')");
+            await driver.type("input[name='email']", "oracle.tech@yopmail.com");
+            await driver.click("button:has-text('Next')");
+            await driver.type("input[name='password']", "Pibm@123");
+            await driver.click("button:has-text('Sign In')");
+            await driver.waitFor("text=Dashboard");
+            logger.info("✅ Composite Action: Login Success!");
+        });
+    }
+}

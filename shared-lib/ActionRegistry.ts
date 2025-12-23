@@ -48,6 +48,22 @@ export class ActionRegistry {
             await driver.type(selector, data);
         });
 
+        this.registerAction('press', async (driver, logger, data) => {
+            if (!data) throw new Error("Key required for press action");
+            await (driver as any).press(data);
+        });
+
+        this.registerAction('js_eval', async (driver, logger, data) => {
+            if (!data) throw new Error("JS source required for js_eval action");
+            await (driver as any).evaluate(data);
+        });
+
+        this.registerAction('select', async (driver, logger, data, selector) => {
+            if (!data) throw new Error("Value required for select action");
+            if (!selector) throw new Error("Selector required for select action");
+            await driver.select(selector, data);
+        });
+
         this.registerAction('waitfor', async (driver, logger, _, selector) => {
             if (!selector) throw new Error("Selector required for waitFor action");
             await driver.waitFor(selector);

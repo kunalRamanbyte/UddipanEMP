@@ -56,7 +56,25 @@ export class PlaywrightDriver extends UniversalDriver {
         return buffer.toString('base64');
     }
 
+    async select(selector: string, value: string) {
+        if (!this.page) throw new Error("Driver not initialized");
+        // Try selecting by value first, then label
+        await this.page.selectOption(selector, value).catch(() =>
+            this.page!.selectOption(selector, { label: value })
+        );
+    }
+
     async close() {
         if (this.browser) await this.browser.close();
+    }
+
+    async press(key: string) {
+        if (!this.page) throw new Error("Driver not initialized");
+        await this.page.keyboard.press(key);
+    }
+
+    async evaluate(js: string) {
+        if (!this.page) throw new Error("Driver not initialized");
+        return await this.page.evaluate(js);
     }
 }

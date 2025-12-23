@@ -18,5 +18,8 @@ export abstract class UniversalDriver {
     abstract getText(selector: string): Promise<string>;
     abstract init(): Promise<void>;
     abstract close(): Promise<void>;
+    abstract press(key: string): Promise<void>;
+    abstract select(selector: string, value: string): Promise<void>;
+    abstract evaluate(js: string): Promise<any>;
     abstract takeScreenshot(): Promise<string | null>;
 }

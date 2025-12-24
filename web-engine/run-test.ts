@@ -5,9 +5,9 @@ import { WebLocators } from './WebPage';
 import * as path from 'path';
 
 async function main() {
-    // 2. Load Data
-    const dataPath = path.resolve(__dirname, '../data-vault/data/test-suite.xlsx');
-    console.log(`Loading data from: ${dataPath}`);
+    // 2. Load Data (Discovery Mode)
+    const dataPath = path.resolve(__dirname, '../data-vault/data');
+    console.log(`Searching for test data in: ${dataPath}`);
     const testCases = DataParser.loadTestCases(dataPath);
 
     // Filter if arg provided

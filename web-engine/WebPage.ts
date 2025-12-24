@@ -33,6 +33,8 @@ export const WebLocators: LocatorRepo = {
     // Select2 Components (Multi-select)
     "CITY_SELECT2_CONTAINER": "select#PostJobRequest_JobCitiesString + .select2-container .select2-selection--multiple",
     "CITY_SELECT2_INPUT": "select#PostJobRequest_JobCitiesString + .select2-container .select2-search__field",
+    "SELECT2_OPTION_DHAKA": "xpath=//li[contains(@class, 'select2-results__option') and text()='Dhaka']",
+    "SELECT2_OPTION_KOLKATA": "xpath=//li[contains(@class, 'select2-results__option') and text()='Kolkata']",
     "SKILLS_SELECT2_CONTAINER": "select#PostJobRequest_JobSkillsString + .select2-container .select2-selection--multiple",
     "SKILLS_SELECT2_INPUT": "select#PostJobRequest_JobSkillsString + .select2-container .select2-search__field",
 
@@ -40,11 +42,15 @@ export const WebLocators: LocatorRepo = {
     "POSITIONS_INPUT": "#PostJobRequest_NoofPositions",
     "START_DATE_INPUT": "#PostJobRequest_JobPostedStartDate",
     "END_DATE_INPUT": "#PostJobRequest_JobPostedEndDate",
+    "CALENDAR_DAY_24": "xpath=//td[text()='24']",
+    "CALENDAR_DAY_31": "xpath=//td[text()='31']",
     "SUBMIT_JOB_BTN": "#BtnPostJob",
 
     // Verification
     "RECENT_JOBS_LINK": "a[href='/Job/RecentJob']",
     "RECENT_JOBS_SEARCH_INPUT": "#RecentJobRequests_Searchkey",
     "RECENT_JOBS_SEARCH_BTN": "#SearchRecentJob",
-    "RECENT_JOBS_ITEM": "a.text-dark"
+    "RECENT_JOBS_ITEM": "a.text-dark",
+    "LATEST_JOB_TITLE": ".job-list-desc h6.mb-2:first-of-type a.text-dark",
+    "NO_SHOW_LIST_BTN": "button:has-text('No, show list!')"
 };

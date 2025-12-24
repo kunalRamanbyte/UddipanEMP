@@ -1,6 +1,6 @@
 import { PlaywrightDriver } from './PlaywrightDriver';
-import { TestRunner } from '@automation/shared-lib';
-import { DataParser } from '@automation/data-vault';
+import { TestRunner } from '../shared-lib/TestRunner';
+import { DataParser } from '../data-vault/DataParser';
 import { WebLocators } from './WebPage';
 import * as path from 'path';
 

@@ -11,6 +11,8 @@ export interface AppConfig {
     capabilities?: Record<string, any>;
     credentials?: Record<string, string>;
     quality_gate?: QualityGateConfig;
+    enableHealing?: boolean;
+    strictMode?: boolean;
 }
 
 export class ConfigProvider {
@@ -19,7 +21,7 @@ export class ConfigProvider {
 
     private constructor() {
         const env = process.env.APP_ENV || 'dev';
-        const configPath = path.resolve(__dirname, `../../data-vault/config/${env}.json`);
+        const configPath = path.resolve(__dirname, `../data-vault/config/${env}.json`);
 
         if (fs.existsSync(configPath)) {
             const fileContent = fs.readFileSync(configPath, 'utf-8');

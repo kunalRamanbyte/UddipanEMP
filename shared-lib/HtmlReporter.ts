@@ -3,6 +3,7 @@ import * as path from 'path';
 
 export interface TestResult {
     testCaseId: string;
+    testCaseName?: string;
     stepId: string;
     action: string;
     selector: string;
@@ -219,7 +220,7 @@ export class HtmlReporter {
         <div class="test-case-card ${caseStatus}">
             <div class="test-case-header" onclick="toggleSteps('steps-${index}')">
                 <div>
-                    <span class="test-case-title">${caseId}</span>
+                    <span class="test-case-title">${steps[0].testCaseName || caseId}</span>
                     <span class="status-pill ${caseStatus}-pill" style="margin-left: 15px;">${caseStatus.toUpperCase()}</span>
                 </div>
                 <div class="test-case-meta">

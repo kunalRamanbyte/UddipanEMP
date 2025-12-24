@@ -12,6 +12,7 @@ import { ConfigProvider } from './ConfigProvider';
 // Define the interface for a Test Case (matching DataParser)
 export interface TestCase {
     testCaseId: string;
+    testCaseName?: string;
     id: string;
     action: string;
     selector: string;
@@ -25,6 +26,7 @@ export class TestRunner {
     private locatorRepo: Record<string, string>;
     private registry: ActionRegistry;
     private validator: SchemaValidator;
+    private sessionContext: Record<string, string> = {};
 
     constructor(driverClass: new () => UniversalDriver, locatorRepo: Record<string, string> = {}) {
         this.driverClass = driverClass;
@@ -83,6 +85,7 @@ export class TestRunner {
     private async runTestCase(caseId: string, steps: TestCase[], platform: string, driver: UniversalDriver) {
         const logger = new Logger();
         logger.info(`=== Starting Test Case: ${caseId} ===`);
+        this.sessionContext = {}; // Reset context for each test case run
 
         try {
             for (const step of steps) {
@@ -103,6 +106,7 @@ export class TestRunner {
 
         const result: TestResult = {
             testCaseId: caseId,
+            testCaseName: step.testCaseName,
             stepId: step.id,
             action: step.action,
             selector: step.selector,
@@ -113,8 +117,12 @@ export class TestRunner {
             retryCount: 0
         };
 
+        const config = ConfigProvider.getInstance().getConfig();
+        const isStrict = config.strictMode || process.env.STRICT_MODE === 'true';
+        const healingEnabled = config.enableHealing !== false && process.env.ENABLE_HEALING !== 'false';
+
         let attempt = 0;
-        const maxAttempts = 2; // 1 initial + 1 retry
+        const maxAttempts = isStrict ? 1 : 2; // 1 in strict mode, 2 otherwise
 
         try {
             while (attempt < maxAttempts) {
@@ -131,28 +139,36 @@ export class TestRunner {
                         result.retryCount = attempt - 1;
 
                         // Healing logic
-                        try {
-                            const screenshot = await driver.takeScreenshot() || "base64_placeholder";
-                            const healing = await this.healer.healLocator(screenshot, step.selector, platform as any);
+                        if (healingEnabled && !isStrict) {
+                            try {
+                                logger.info(`Attempting AI Self-Healing...`);
+                                const screenshot = await driver.takeScreenshot() || "base64_placeholder";
+                                const healing = await this.healer.healLocator(screenshot, step.selector, platform as any);
 
-                            result.confidence = healing.confidence;
-                            result.healingReason = healing.reason;
+                                result.confidence = healing.confidence;
+                                result.healingReason = healing.reason;
 
-                            if (healing.confidence >= 0.8) {
-                                logger.info(`Healer found fix with high confidence (${Math.round(healing.confidence * 100)}%): ${healing.newSelector}`);
-                                step.selector = healing.newSelector;
-                                await this.executeStep(step, driver, logger);
-                                result.status = 'HEALED';
-                                result.isHealed = true;
-                                result.selector = `${step.selector} (Healed)`;
-                            } else {
-                                logger.warn(`Healer found fix but confidence was too low. Failing for safety.`);
-                                throw new Error(`Healing failed: Confidence too low. AI Logic: ${healing.reason}`);
+                                if (healing.confidence >= 0.8) {
+                                    logger.info(`Healer found fix with high confidence (${Math.round(healing.confidence * 100)}%): ${healing.newSelector}`);
+                                    step.selector = healing.newSelector;
+                                    await this.executeStep(step, driver, logger);
+                                    result.status = 'HEALED';
+                                    result.isHealed = true;
+                                    result.selector = `${step.selector} (Healed)`;
+                                } else {
+                                    logger.warn(`Healer found fix but confidence was too low. Failing for safety.`);
+                                    throw new Error(`Healing failed: Confidence too low. AI Logic: ${healing.reason}`);
+                                }
+                            } catch (healError: any) {
+                                result.status = 'FAIL';
+                                result.errorMessage = healError.message || String(error);
+                                logger.error(`Healer could not resolve the issue safely.`);
                             }
-                        } catch (healError: any) {
+                        } else {
+                            // No healing allowed - Mark as FAIL
                             result.status = 'FAIL';
-                            result.errorMessage = healError.message || String(error);
-                            logger.error(`Healer could not resolve the issue safely.`);
+                            result.errorMessage = String(error);
+                            if (isStrict) logger.error(`Strict Mode: Healing skipped.`);
                         }
                     } else {
                         await new Promise(r => setTimeout(r, 1000));
@@ -197,9 +213,29 @@ export class TestRunner {
 
         const handler = this.registry.getAction(test.action);
         if (handler) {
-            await handler(driver, logger, actualData, actualSelector);
+            // Runtime dynamic data resolution (e.g., {{TIMESTAMP}})
+            const resolvedData = this.resolveDynamicData(actualData);
+            if (resolvedData !== actualData) {
+                logger.info(`Dynamic Resolution: '${actualData}' -> '${resolvedData}'`);
+            }
+            await handler(driver, logger, resolvedData, actualSelector);
         } else {
             throw new Error(`Unknown action found during execution: ${test.action}`);
         }
+    }
+
+    private resolveDynamicData(data: string | undefined): string {
+        if (!data) return '';
+        let resolved = data;
+
+        // Built-in: {{TIMESTAMP}} - generated once per test case run
+        if (resolved.includes('{{TIMESTAMP}}')) {
+            if (!this.sessionContext['TIMESTAMP']) {
+                this.sessionContext['TIMESTAMP'] = Date.now().toString();
+            }
+            resolved = resolved.replace(/{{TIMESTAMP}}/g, this.sessionContext['TIMESTAMP']);
+        }
+
+        return resolved;
     }
 }

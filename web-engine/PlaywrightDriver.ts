@@ -1,4 +1,4 @@
-import { UniversalDriver, Platform } from '@automation/shared-lib';
+import { UniversalDriver, Platform } from '../shared-lib/UniversalDriver';
 import { Page, Browser, chromium } from 'playwright';
 
 export class PlaywrightDriver extends UniversalDriver {

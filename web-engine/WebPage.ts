@@ -42,15 +42,40 @@ export const WebLocators: LocatorRepo = {
     "POSITIONS_INPUT": "#PostJobRequest_NoofPositions",
     "START_DATE_INPUT": "#PostJobRequest_JobPostedStartDate",
     "END_DATE_INPUT": "#PostJobRequest_JobPostedEndDate",
-    "CALENDAR_DAY_24": "xpath=//td[text()='24']",
-    "CALENDAR_DAY_31": "xpath=//td[text()='31']",
+    "CALENDAR_DAY_24": "xpath=//td[text()='{{CURRENT_DAY}}']",
+    "CALENDAR_DAY_31": "xpath=//td[text()='{{CURRENT_DAY}}']",
     "SUBMIT_JOB_BTN": "#BtnPostJob",
+
+    // Internship Posting Flow
+    "POST_INTERNSHIP_MENU_LINK": "a[href='/Internship/PostInternship']",
+    "INTERNSHIP_TITLE_INPUT": "#PostInternshipRequest_InternshipTitle",
+    "INTERNSHIP_TYPE_SELECT": "#PostInternshipRequest_InternshipType",
+    "INTERNSHIP_CATEGORY_SELECT": "#PostInternshipRequest_InternshipCategory",
+    "INTERNSHIP_EDUCATION_SELECT": "#PostInternshipRequest_EducationLevel",
+    "MIN_STIPEND_INPUT": "#PostInternshipRequest_MinStipend",
+    "MAX_STIPEND_INPUT": "#PostInternshipRequest_MaxStipend",
+    "INTERNSHIP_MAX_EXP_SELECT": "#PostInternshipRequest_MaxExp",
+    "INTERNSHIP_CITY_SELECT2_CONTAINER": "select#PostInternshipRequest_InternshipCitiesString + .select2-container .select2-selection--multiple",
+    "INTERNSHIP_CITY_SELECT2_INPUT": "select#PostInternshipRequest_InternshipCitiesString + .select2-container .select2-search__field",
+    "INTERNSHIP_POSITIONS_INPUT": "#PostInternshipRequest_NoofPositions",
+    "INTERNSHIP_START_DATE_INPUT": "#PostInternshipRequest_InternshipStartDate",
+    "INTERNSHIP_END_DATE_INPUT": "#PostInternshipRequest_InternshipEndDate",
+    "INTERNSHIP_DURATION_INPUT": "#PostInternshipRequest_TotalDuration",
+    "INTERNSHIP_SKILLS_SELECT2_CONTAINER": "select#PostInternshipRequest_InternshipSkillsString + .select2-container .select2-selection--multiple",
+    "INTERNSHIP_SKILLS_SELECT2_INPUT": "select#PostInternshipRequest_InternshipSkillsString + .select2-container .select2-search__field",
+    "SELECT2_OPTION_2D_ANIMATION": "xpath=//li[contains(@class, 'select2-results__option') and text()='2D ANIMATION']",
+    "SUBMIT_INTERNSHIP_BTN": "#BtnPostInternship",
 
     // Verification
     "RECENT_JOBS_LINK": "a[href='/Job/RecentJob']",
+    "RECENT_INTERNSHIPS_LINK": "a[href='/Internship/RecentInternship']",
     "RECENT_JOBS_SEARCH_INPUT": "#RecentJobRequests_Searchkey",
     "RECENT_JOBS_SEARCH_BTN": "#SearchRecentJob",
     "RECENT_JOBS_ITEM": "a.text-dark",
     "LATEST_JOB_TITLE": ".job-list-desc h6.mb-2:first-of-type a.text-dark",
-    "NO_SHOW_LIST_BTN": "button:has-text('No, show list!')"
+    "NO_SHOW_LIST_BTN": "button:has-text('No, show list!')",
+    "EDIT_JOB_BTN": "a.btn-primary:has-text('Edit')",
+    "UPDATE_JOB_BTN": "button:has-text('Update Job')",
+    "UPDATE_INTERNSHIP_BTN": "button:has-text('Update Internship')",
+    "ALERT_OK_BTN": "button:has-text('OK')"
 };

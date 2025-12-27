@@ -28,7 +28,7 @@ export class HtmlReporter {
         this.results.push(result);
     }
 
-    generateReport(outputPath: string) {
+    generateReport(outputPath: string, startTime: Date, endTime: Date) {
         const totalDuration = this.results.reduce((sum, r) => sum + (r.duration || 0), 0);
         const totalRetries = this.results.reduce((sum, r) => sum + (r.retryCount || 0), 0);
         const healedCount = this.results.filter(r => r.status === 'HEALED').length;
@@ -78,6 +78,7 @@ export class HtmlReporter {
         
         .summary-card .value { font-size: 28px; font-weight: bold; display: block; color: #333; }
         .summary-card .label { color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .summary-card .sub-value { font-size: 11px; color: #888; margin-top: 5px; }
         
         .insight-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .insight-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -147,10 +148,12 @@ export class HtmlReporter {
         <div class="summary-card success">
             <span class="label">Platform Health</span>
             <span class="value">${Math.round(((passedCases + healedCases) / totalCases) * 100)}%</span>
+            <span class="sub-value">Start: ${startTime.toLocaleString()}</span>
         </div>
         <div class="summary-card">
             <span class="label">Total Execution</span>
             <span class="value">${(totalDuration / 1000).toFixed(1)}s</span>
+            <span class="sub-value">End: ${endTime.toLocaleString()}</span>
         </div>
         <div class="summary-card warning">
             <span class="label">AI Healing ROI</span>

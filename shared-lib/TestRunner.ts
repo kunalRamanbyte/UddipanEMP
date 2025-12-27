@@ -42,6 +42,8 @@ export class TestRunner {
         const platform = process.env.PLATFORM || 'web';
         logger.suiteWarn(`Starting Suite execution on ${platform} (Parallel: true)`);
 
+        const suiteStartTime = new Date();
+
         // 1. Pre-Run Validation
         logger.suiteWarn(`🔍 Running Pre-run Validation...`);
         const validation = SchemaValidator.validate(testCases);
@@ -62,7 +64,8 @@ export class TestRunner {
             await driver.close();
         }
 
-        const reportPath = this.reporter.generateReport('./report.html');
+        const suiteEndTime = new Date();
+        const reportPath = this.reporter.generateReport('./report.html', suiteStartTime, suiteEndTime);
         logger.suiteWarn(`All tests completed. Report generated at: ${reportPath}`);
 
         // 2. CI Quality Gate Enforcement
@@ -194,8 +197,12 @@ export class TestRunner {
 
     private async executeStep(test: TestCase, driver: UniversalDriver, logger: Logger) {
         // Resolve dynamic data and selectors from repo
-        const repoSelector = this.locatorRepo[test.selector] || test.selector;
-        const actualData = this.locatorRepo[test.data || ''] || test.data;
+        const rawRepoSelector = this.locatorRepo[test.selector] || test.selector;
+        const rawActualData = this.locatorRepo[test.data || ''] || test.data;
+
+        // Resolve dynamic placeholders in both selector and data
+        const repoSelector = this.resolveDynamicData(rawRepoSelector);
+        const resolvedData = this.resolveDynamicData(rawActualData);
 
         // Apply Priority Strategy Policy
         const actualSelector = LocatorResolver.resolve(repoSelector);
@@ -208,15 +215,13 @@ export class TestRunner {
             logger.info(`Policy Applied: '${repoSelector}' -> '${actualSelector}'`);
         }
         if (test.data && this.locatorRepo[test.data]) {
-            logger.info(`Resolved named data: ${test.data} -> ${actualData}`);
+            logger.info(`Resolved named data: ${test.data} -> ${resolvedData}`);
         }
 
         const handler = this.registry.getAction(test.action);
         if (handler) {
-            // Runtime dynamic data resolution (e.g., {{TIMESTAMP}})
-            const resolvedData = this.resolveDynamicData(actualData);
-            if (resolvedData !== actualData) {
-                logger.info(`Dynamic Resolution: '${actualData}' -> '${resolvedData}'`);
+            if (resolvedData !== rawActualData) {
+                logger.info(`Dynamic Resolution: '${rawActualData}' -> '${resolvedData}'`);
             }
             await handler(driver, logger, resolvedData, actualSelector);
         } else {
@@ -234,6 +239,11 @@ export class TestRunner {
                 this.sessionContext['TIMESTAMP'] = Date.now().toString();
             }
             resolved = resolved.replace(/{{TIMESTAMP}}/g, this.sessionContext['TIMESTAMP']);
+        }
+
+        // Built-in: {{CURRENT_DAY}}
+        if (resolved.includes('{{CURRENT_DAY}}')) {
+            resolved = resolved.replace(/{{CURRENT_DAY}}/g, new Date().getDate().toString());
         }
 
         return resolved;

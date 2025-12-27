@@ -18,6 +18,10 @@ export class PlaywrightDriver extends UniversalDriver {
 
     async click(selector: string): Promise<void> {
         if (!this.page) throw new Error("Driver not initialized");
+
+        // Added 3s delay for manual observation as requested
+        await new Promise(r => setTimeout(r, 3000));
+
         try {
             // First attempt: Standard click with 10s timeout
             await this.page.click(selector, { timeout: 10000 });

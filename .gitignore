@@ -4,3 +4,16 @@ test-results
 playwright-report
 blob-report
 .env
+*.log
+debug_log.txt
+tc007_output.txt
+test_mcp.js
+test_mcp_list.js
+inspect_tc007.ts
+find_tc007_file.ts
+update_tc007.ts
+list_tcs.ts
+test_regex.ts
+web-engine/report.html
+report.html
+~$*

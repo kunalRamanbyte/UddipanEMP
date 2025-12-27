@@ -64,9 +64,26 @@ export class ActionRegistry {
             await driver.select(selector, data);
         });
 
-        this.registerAction('waitfor', async (driver, logger, _, selector) => {
+        this.registerAction('waitfor', async (driver, logger, data, selector) => {
             if (!selector) throw new Error("Selector required for waitFor action");
-            await driver.waitFor(selector);
+            if (data) {
+                // If data is provided, we assume we want to wait for that text within the selector
+                // Or if selector is 'body', just wait for text on page
+                const finalSelector = data.startsWith('text=') ? data : `text=${data}`;
+                await driver.waitFor(finalSelector);
+            } else {
+                await driver.waitFor(selector);
+            }
+        });
+
+        this.registerAction('verify_text', async (driver, logger, data, selector) => {
+            if (!data) throw new Error("Data required for verify_text action");
+            const targetSelector = selector || 'body';
+            const text = await driver.getText(targetSelector);
+            if (!text.includes(data)) {
+                throw new Error(`Text verification failed. Expected to find "${data}" in "${targetSelector}", but found "${text}"`);
+            }
+            logger.info(`Verified text "${data}" present in ${targetSelector}`);
         });
 
         this.registerAction('gettext', async (driver, logger, _, selector) => {

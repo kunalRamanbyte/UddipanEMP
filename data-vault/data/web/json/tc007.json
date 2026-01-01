@@ -1,0 +1,168 @@
+{
+  "testCaseId": "TC007",
+  "testCaseName": "End-to-End Internship Posting",
+  "steps": [
+    {
+      "id": "1",
+      "action": "login_to_employer_portal",
+      "selector": "",
+      "data": ""
+    },
+    {
+      "id": "2",
+      "action": "click",
+      "selector": "MANAGE_POSTINGS_TOGGLE",
+      "data": ""
+    },
+    {
+      "id": "3",
+      "action": "click",
+      "selector": "POST_INTERNSHIP_MENU_LINK",
+      "data": ""
+    },
+    {
+      "id": "4",
+      "action": "type",
+      "selector": "INTERNSHIP_TITLE_INPUT",
+      "data": "demo internship {{TIMESTAMP}}"
+    },
+    {
+      "id": "5",
+      "action": "select",
+      "selector": "INTERNSHIP_TYPE_SELECT",
+      "data": "Full"
+    },
+    {
+      "id": "6",
+      "action": "select",
+      "selector": "INTERNSHIP_CATEGORY_SELECT",
+      "data": "1"
+    },
+    {
+      "id": "7",
+      "action": "select",
+      "selector": "INTERNSHIP_EDUCATION_SELECT",
+      "data": "3"
+    },
+    {
+      "id": "8",
+      "action": "type",
+      "selector": "MIN_STIPEND_INPUT",
+      "data": "10000"
+    },
+    {
+      "id": "9",
+      "action": "type",
+      "selector": "MAX_STIPEND_INPUT",
+      "data": "20000"
+    },
+    {
+      "id": "10",
+      "action": "select",
+      "selector": "INTERNSHIP_MAX_EXP_SELECT",
+      "data": "3"
+    },
+    {
+      "id": "11",
+      "action": "click",
+      "selector": "INTERNSHIP_CITY_SELECT2_CONTAINER",
+      "data": ""
+    },
+    {
+      "id": "12",
+      "action": "type",
+      "selector": "INTERNSHIP_CITY_SELECT2_INPUT",
+      "data": "kolkata"
+    },
+    {
+      "id": "13",
+      "action": "click",
+      "selector": "SELECT2_OPTION_KOLKATA",
+      "data": ""
+    },
+    {
+      "id": "14",
+      "action": "click",
+      "selector": "INTERNSHIP_SKILLS_SELECT2_CONTAINER",
+      "data": ""
+    },
+    {
+      "id": "15",
+      "action": "type",
+      "selector": "INTERNSHIP_SKILLS_SELECT2_INPUT",
+      "data": "2D ANIMATION"
+    },
+    {
+      "id": "16",
+      "action": "click",
+      "selector": "SELECT2_OPTION_2D_ANIMATION",
+      "data": ""
+    },
+    {
+      "id": "17",
+      "action": "js_eval",
+      "selector": "",
+      "data": "CKEDITOR.instances.InternshipDescription.setData('This is a detailed internship description for the demo. It needs to be at least one hundred characters long to pass the validation on the server side. So I am adding more text here to reach the limit safely. Adding a bit more to be sure.')"
+    },
+    {
+      "id": "18",
+      "action": "type",
+      "selector": "INTERNSHIP_POSITIONS_INPUT",
+      "data": "5"
+    },
+    {
+      "id": "19",
+      "action": "click",
+      "selector": "INTERNSHIP_START_DATE_INPUT",
+      "data": ""
+    },
+    {
+      "id": "20",
+      "action": "click",
+      "selector": "CALENDAR_DAY_24",
+      "data": ""
+    },
+    {
+      "id": "21",
+      "action": "click",
+      "selector": "INTERNSHIP_END_DATE_INPUT",
+      "data": ""
+    },
+    {
+      "id": "22",
+      "action": "click",
+      "selector": "CALENDAR_DAY_31",
+      "data": ""
+    },
+    {
+      "id": "23",
+      "action": "type",
+      "selector": "INTERNSHIP_DURATION_INPUT",
+      "data": "7"
+    },
+    {
+      "id": "24",
+      "action": "click",
+      "selector": "SUBMIT_INTERNSHIP_BTN",
+      "data": ""
+    },
+    {
+      "id": "25",
+      "action": "click",
+      "selector": "NO_SHOW_LIST_BTN",
+      "data": ""
+    },
+    {
+      "id": "26",
+      "action": "click",
+      "selector": "RECENT_INTERNSHIPS_LINK",
+      "data": ""
+    },
+    {
+      "id": "27",
+      "action": "waitfor",
+      "selector": "LATEST_JOB_TITLE",
+      "data": "text=demo internship {{TIMESTAMP}}"
+    }
+  ]
+}

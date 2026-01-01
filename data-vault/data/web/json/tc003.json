@@ -1,0 +1,30 @@
+{
+  "testCaseId": "TC003",
+  "testCaseName": "Empty Login Validation",
+  "steps": [
+    {
+      "id": "1",
+      "action": "navigate",
+      "selector": "",
+      "data": "https://testplacementwebv1.azurewebsites.net/"
+    },
+    {
+      "id": "2",
+      "action": "click",
+      "selector": "EMPLOYER_PORTAL_BTN",
+      "data": ""
+    },
+    {
+      "id": "3",
+      "action": "click",
+      "selector": "EMPLOYER_LOGIN_BTN",
+      "data": ""
+    },
+    {
+      "id": "4",
+      "action": "waitfor",
+      "selector": "text=Invalid",
+      "data": ""
+    }
+  ]
+}

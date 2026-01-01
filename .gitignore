@@ -17,3 +17,5 @@ test_regex.ts
 web-engine/report.html
 report.html
 ~$*
+.gemini/
+*.db

@@ -1,0 +1,60 @@
+{
+  "testCaseId": "TC008",
+  "testCaseName": "Verify Edit Job Title",
+  "steps": [
+    {
+      "id": "1",
+      "action": "login_to_employer_portal",
+      "selector": "",
+      "data": ""
+    },
+    {
+      "id": "2",
+      "action": "click",
+      "selector": "RECENT_JOBS_LINK",
+      "data": ""
+    },
+    {
+      "id": "3",
+      "action": "waitfor",
+      "selector": "EDIT_JOB_BTN",
+      "data": ""
+    },
+    {
+      "id": "4",
+      "action": "click",
+      "selector": "EDIT_JOB_BTN",
+      "data": ""
+    },
+    {
+      "id": "5",
+      "action": "waitfor",
+      "selector": "JOB_TITLE_INPUT",
+      "data": ""
+    },
+    {
+      "id": "6",
+      "action": "type",
+      "selector": "JOB_TITLE_INPUT",
+      "data": "demo job {{TIMESTAMP}} edit"
+    },
+    {
+      "id": "7",
+      "action": "click",
+      "selector": "UPDATE_JOB_BTN",
+      "data": ""
+    },
+    {
+      "id": "8",
+      "action": "click",
+      "selector": "ALERT_OK_BTN",
+      "data": ""
+    },
+    {
+      "id": "9",
+      "action": "verify_text",
+      "selector": "css:body",
+      "data": "demo job {{TIMESTAMP}} edit"
+    }
+  ]
+}

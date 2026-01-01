@@ -1,0 +1,24 @@
+{
+  "testCaseId": "TC001",
+  "testCaseName": "Verify Employer Portal Navigation",
+  "steps": [
+    {
+      "id": "1",
+      "action": "navigate",
+      "selector": "",
+      "data": "https://testplacementwebv1.azurewebsites.net/"
+    },
+    {
+      "id": "2",
+      "action": "click",
+      "selector": "EMPLOYER_PORTAL_BTN",
+      "data": ""
+    },
+    {
+      "id": "3",
+      "action": "waitfor",
+      "selector": "WELCOME_HEADER",
+      "data": ""
+    }
+  ]
+}

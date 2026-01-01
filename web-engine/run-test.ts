@@ -8,7 +8,7 @@ async function main() {
     // 2. Load Data (Discovery Mode)
     const dataPath = path.resolve(__dirname, '../data-vault/data');
     console.log(`Searching for test data in: ${dataPath}`);
-    const testCases = DataParser.loadTestCases(dataPath);
+    const testCases = await DataParser.loadTestCases(dataPath);
 
     // Filter if arg provided
     const args = process.argv.slice(2);

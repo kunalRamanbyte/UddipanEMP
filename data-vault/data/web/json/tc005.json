@@ -1,0 +1,162 @@
+{
+  "testCaseId": "TC005",
+  "testCaseName": "End-to-End Job Posting",
+  "steps": [
+    {
+      "id": "1",
+      "action": "login_to_employer_portal",
+      "selector": "",
+      "data": ""
+    },
+    {
+      "id": "2",
+      "action": "click",
+      "selector": "MANAGE_POSTINGS_TOGGLE",
+      "data": ""
+    },
+    {
+      "id": "3",
+      "action": "click",
+      "selector": "POST_A_JOB_MENU_LINK",
+      "data": ""
+    },
+    {
+      "id": "4",
+      "action": "type",
+      "selector": "JOB_TITLE_INPUT",
+      "data": "demo job {{TIMESTAMP}}"
+    },
+    {
+      "id": "5",
+      "action": "select",
+      "selector": "JOB_TYPE_SELECT",
+      "data": "Full"
+    },
+    {
+      "id": "6",
+      "action": "select",
+      "selector": "JOB_CATEGORY_SELECT",
+      "data": "1"
+    },
+    {
+      "id": "7",
+      "action": "select",
+      "selector": "EDUCATION_LEVEL_SELECT",
+      "data": "2"
+    },
+    {
+      "id": "8",
+      "action": "type",
+      "selector": "MIN_SALARY_INPUT",
+      "data": "100000"
+    },
+    {
+      "id": "9",
+      "action": "type",
+      "selector": "MAX_SALARY_INPUT",
+      "data": "10000000"
+    },
+    {
+      "id": "10",
+      "action": "select",
+      "selector": "MIN_EXP_SELECT",
+      "data": "1"
+    },
+    {
+      "id": "11",
+      "action": "select",
+      "selector": "MAX_EXP_SELECT",
+      "data": "7"
+    },
+    {
+      "id": "12",
+      "action": "click",
+      "selector": "CITY_SELECT2_CONTAINER",
+      "data": ""
+    },
+    {
+      "id": "13",
+      "action": "type",
+      "selector": "CITY_SELECT2_INPUT",
+      "data": "Kolkata"
+    },
+    {
+      "id": "14",
+      "action": "click",
+      "selector": "SELECT2_OPTION_KOLKATA",
+      "data": ""
+    },
+    {
+      "id": "15",
+      "action": "click",
+      "selector": "SKILLS_SELECT2_CONTAINER",
+      "data": ""
+    },
+    {
+      "id": "16",
+      "action": "type",
+      "selector": "SKILLS_SELECT2_INPUT",
+      "data": "2D ANIMATION"
+    },
+    {
+      "id": "17",
+      "action": "press",
+      "selector": "SKILLS_SELECT2_INPUT",
+      "data": "Enter"
+    },
+    {
+      "id": "18",
+      "action": "js_eval",
+      "selector": "",
+      "data": "CKEDITOR.instances.jobDescription.setData('This is a comprehensive job description for the demo job posting. It needs to be at least 100 characters long to satisfy the front-end validation requirements.')"
+    },
+    {
+      "id": "19",
+      "action": "type",
+      "selector": "POSITIONS_INPUT",
+      "data": "2"
+    },
+    {
+      "id": "20",
+      "action": "click",
+      "selector": "START_DATE_INPUT",
+      "data": ""
+    },
+    {
+      "id": "21",
+      "action": "click",
+      "selector": "CALENDAR_DAY_24",
+      "data": ""
+    },
+    {
+      "id": "22",
+      "action": "click",
+      "selector": "END_DATE_INPUT",
+      "data": ""
+    },
+    {
+      "id": "23",
+      "action": "click",
+      "selector": "CALENDAR_DAY_31",
+      "data": ""
+    },
+    {
+      "id": "24",
+      "action": "click",
+      "selector": "SUBMIT_JOB_BTN",
+      "data": ""
+    },
+    {
+      "id": "25",
+      "action": "click",
+      "selector": "NO_SHOW_LIST_BTN",
+      "data": ""
+    },
+    {
+      "id": "26",
+      "action": "waitfor",
+      "selector": "LATEST_JOB_TITLE",
+      "data": "text=demo job {{TIMESTAMP}}"
+    }
+  ]
+}

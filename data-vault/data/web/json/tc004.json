@@ -1,0 +1,18 @@
+{
+  "testCaseId": "TC004",
+  "testCaseName": "Successful Employer Login",
+  "steps": [
+    {
+      "id": "1",
+      "action": "login_to_employer_portal",
+      "selector": "",
+      "data": ""
+    },
+    {
+      "id": "2",
+      "action": "waitfor",
+      "selector": "DASHBOARD_HEADING",
+      "data": ""
+    }
+  ]
+}

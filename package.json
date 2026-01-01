@@ -14,5 +14,9 @@
   },
   "devDependencies": {
     "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "@types/sqlite3": "^3.1.11",
+    "sqlite3": "^5.1.7"
   }
 }

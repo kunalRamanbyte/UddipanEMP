@@ -1,6 +1,5 @@
-import * as fs from 'fs';
+import * as sqlite3 from 'sqlite3';
 import * as path from 'path';
-import * as XLSX from 'xlsx';
 
 export interface TestCase {
     testCaseId: string;
@@ -12,47 +11,40 @@ export interface TestCase {
 }
 
 export class DataParser {
-    static loadTestCases(targetPath: string): Record<string, TestCase[]> {
+    static async loadTestCases(targetPath: string): Promise<Record<string, TestCase[]>> {
+        // Use the master.db which is expected to be in a specific location
+        // or derived from targetPath. For this framework, we use master.db
+        const dbPath = path.join(targetPath, 'web/master.db');
         const grouped: Record<string, TestCase[]> = {};
 
-        const processPath = (currentPath: string) => {
-            const stats = fs.statSync(currentPath);
+        return new Promise((resolve, reject) => {
+            const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY, (err) => {
+                if (err) return reject(err);
+            });
 
-            if (stats.isDirectory()) {
-                const files = fs.readdirSync(currentPath);
-                for (const file of files) {
-                    processPath(path.join(currentPath, file));
+            const query = `
+                SELECT tc.testCaseId, tc.testCaseName, s.stepId as id, s.action, s.selector, s.data
+                FROM test_cases tc
+                JOIN steps s ON tc.testCaseId = s.testCaseId
+                ORDER BY tc.testCaseId, s.id
+            `;
+
+            db.all(query, [], (err, rows: any[]) => {
+                if (err) {
+                    db.close();
+                    return reject(err);
                 }
-            } else if (currentPath.endsWith('.xlsx')) {
-                const fileData = this.loadFile(currentPath);
-                for (const [caseId, steps] of Object.entries(fileData)) {
-                    if (!grouped[caseId]) {
-                        grouped[caseId] = steps;
-                    } else {
-                        grouped[caseId].push(...steps);
+
+                rows.forEach(row => {
+                    if (!grouped[row.testCaseId]) {
+                        grouped[row.testCaseId] = [];
                     }
-                }
-            }
-        };
+                    grouped[row.testCaseId].push(row);
+                });
 
-        processPath(targetPath);
-        return grouped;
-    }
-
-    private static loadFile(filePath: string): Record<string, TestCase[]> {
-        const workbook = XLSX.readFile(filePath);
-        const grouped: Record<string, TestCase[]> = {};
-
-        for (const sheetName of workbook.SheetNames) {
-            const sheet = workbook.Sheets[sheetName];
-            const rawData = XLSX.utils.sheet_to_json<TestCase>(sheet);
-
-            for (const row of rawData) {
-                const id = row.testCaseId || 'DEFAULT';
-                if (!grouped[id]) grouped[id] = [];
-                grouped[id].push(row);
-            }
-        }
-        return grouped;
+                db.close();
+                resolve(grouped);
+            });
+        });
     }
 }
